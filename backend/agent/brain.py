@@ -1,5 +1,6 @@
 import json
 import httpx
+from utils.retry import async_retry
 from groq import AsyncGroq
 from core.config import get_settings
 from core.prompts import get_system_prompt, get_final_answer_prompt
@@ -13,7 +14,7 @@ async def call_llm(messages: list) -> str:
         return await call_groq(messages)
     return await call_ollama(messages)
 
-
+@async_retry(max_attempts=3, delay=1.0, backoff=2.0)
 async def call_groq(messages: list) -> str:
     client = AsyncGroq(api_key=settings.groq_api_key)
     response = await client.chat.completions.create(
@@ -24,7 +25,7 @@ async def call_groq(messages: list) -> str:
     )
     return response.choices[0].message.content
 
-
+@async_retry(max_attempts=2, delay=0.5, backoff=2.0)
 async def call_ollama(messages: list) -> str:
     async with httpx.AsyncClient(timeout=settings.ollama_timeout) as client:
         response = await client.post(
@@ -92,8 +93,11 @@ async def run_agent(user_message: str, history: list) -> dict:
     ]
 
     for msg in history:
-        messages.append({"role": msg.role, "content": msg.content})
-
+        if isinstance(msg, dict):
+            messages.append({"role": msg["role"], "content": msg["content"]})
+        else:
+            messages.append({"role": msg.role, "content": msg.content})
+        
     messages.append({"role": "user", "content": user_message})
 
     steps = []

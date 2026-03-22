@@ -3,14 +3,14 @@ from functools import lru_cache
 
 
 class Settings(BaseSettings):
-    # Ollama (fallback)
+    # Ollama
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "tinyllama"
     ollama_timeout: int = 60
 
     # Groq
     groq_api_key: str = ""
-    groq_model: str = "llama3-8b-8192"
+    groq_model: str = "llama-3.1-8b-instant"
     use_groq: bool = False
 
     # Agent
@@ -20,7 +20,19 @@ class Settings(BaseSettings):
     # App
     app_name: str = "Research Agent"
     app_version: str = "1.0.0"
+    api_prefix: str = "/api/v1"
     debug: bool = False
+
+    # Auth
+    secret_key: str = "research-agent-secret-key-change-in-production"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60 * 24  # 24 hours
+
+    # Database
+    database_url: str = "sqlite:///./agent.db"
+
+    # Rate limiting
+    rate_limit_per_minute: int = 20
 
     class Config:
         env_file = ".env"

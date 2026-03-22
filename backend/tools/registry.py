@@ -2,7 +2,7 @@ from tools.search import search_web
 from tools.calculator import calculate
 from tools.datetime_tool import get_datetime
 from tools.weather import get_weather
-
+from tools.datetime_tool import get_datetime, date_difference
 
 # Central registry — add new tools here
 TOOL_REGISTRY = {
@@ -29,7 +29,13 @@ TOOL_REGISTRY = {
         "description": "Get current weather for any city",
         "params": "city (string e.g. 'Bangalore' or 'London')",
         "requires_params": True
-    }
+    },
+    "date_difference": {
+        "function": date_difference,
+        "description": "Calculate exact number of days, months, years between a past date and today. Use for questions like 'how long ago', 'how many days since', 'time gap from date to now'",
+        "params": "from_date (string in YYYY-MM-DD format e.g. '2024-01-15')",
+        "requires_params": True
+    },
 }
 
 
